@@ -31,6 +31,7 @@ let EntryController = class EntryController {
         return this.entryService.findAll(page, limit);
     }
     async findAllByDate(date, page = 1, limit = 100) {
+        console.log("inside findallbydate controller");
         return this.entryService.findAllByDate(date, page, limit);
     }
     async findOne(id) {

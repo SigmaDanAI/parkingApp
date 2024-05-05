@@ -19,10 +19,10 @@ export class EntryService {
     try {
       const entry = await this.entryRepository.create(entryData);
       entry.licensePlate= entry.licensePlate.toUpperCase();
-      entry.entryDateTime = getChileanDateTime();
+      entry.entryDateTime = new Date();
       entry.isParked = true;
       entry.total = 0;
-      const formattedDate= formatDate(entry.entryDateTime);      
+      const formattedDate= formatDate(entry.entryDateTime);
       await this.paymentHistoryService.findOneByDate(formattedDate);
       return await this.entryRepository.save(entry);
     } catch (error) {
@@ -84,7 +84,7 @@ export class EntryService {
       if(entryToUpdate.isParked===false){
         throw new NotFoundException('Entry is not parked');
       }
-      entryToUpdate.exitDateTime = getChileanDateTime();
+      entryToUpdate.exitDateTime = new Date();
       entryToUpdate.isParked = false;
       entryToUpdate.total = entryData.total;
 

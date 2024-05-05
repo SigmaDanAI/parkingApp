@@ -28,7 +28,7 @@ let EntryService = class EntryService {
         try {
             const entry = await this.entryRepository.create(entryData);
             entry.licensePlate = entry.licensePlate.toUpperCase();
-            entry.entryDateTime = (0, timeFunctions_1.getChileanDateTime)();
+            entry.entryDateTime = new Date();
             entry.isParked = true;
             entry.total = 0;
             const formattedDate = (0, timeFunctions_1.formatDate)(entry.entryDateTime);
@@ -92,7 +92,7 @@ let EntryService = class EntryService {
             if (entryToUpdate.isParked === false) {
                 throw new common_1.NotFoundException('Entry is not parked');
             }
-            entryToUpdate.exitDateTime = (0, timeFunctions_1.getChileanDateTime)();
+            entryToUpdate.exitDateTime = new Date();
             entryToUpdate.isParked = false;
             entryToUpdate.total = entryData.total;
             await this.entryRepository.update(id, entryToUpdate);

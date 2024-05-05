@@ -26,18 +26,15 @@ let PaymentHistoryService = class PaymentHistoryService {
         return this.paymentHistoryRepository.find();
     }
     async findOneByDate(date) {
-        console.log(date + " inside findOneByDate");
         const paymentHistory = await this.paymentHistoryRepository.findOne({ where: { date } });
         if (!paymentHistory) {
             const newPaymentHistory = await this.create(new payment_history_entity_1.PaymentHistory());
-            console.log("created!");
             return newPaymentHistory;
         }
-        console.log("found!");
         return paymentHistory;
     }
     async create(paymentHistoryData) {
-        paymentHistoryData.date = (0, timeFunctions_1.formatDate)((0, timeFunctions_1.getChileanDateTime)());
+        paymentHistoryData.date = (0, timeFunctions_1.formatDate)(new Date());
         return this.paymentHistoryRepository.save(paymentHistoryData);
     }
     async update(date, paymentHistoryData) {
