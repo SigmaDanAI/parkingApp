@@ -30,6 +30,7 @@ let EntryService = class EntryService {
             const entry = await this.entryRepository.create(entryData);
             entry.licensePlate = entry.licensePlate.toUpperCase();
             entry.entryDateTime = (0, chileanTimezoneFunc_1.chileanDateGenerator)();
+            console.log(entry.entryDateTime + "chilean date generator");
             entry.isParked = true;
             entry.total = 0;
             const formattedDate = (0, timeFunction_1.formatDate)(entry.entryDateTime);
