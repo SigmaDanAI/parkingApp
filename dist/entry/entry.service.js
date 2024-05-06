@@ -17,8 +17,9 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const entry_entity_1 = require("./entry.entity");
-const timeFunctions_1 = require("../utility/timeFunctions");
+const timeFunction_1 = require("../utility/timeFunction");
 const payment_history_service_1 = require("../paymentHistory/payment-history.service");
+const chileanTimezoneFunc_1 = require("../utility/chileanTimezoneFunc");
 let EntryService = class EntryService {
     constructor(entryRepository, paymentHistoryService) {
         this.entryRepository = entryRepository;
@@ -28,10 +29,10 @@ let EntryService = class EntryService {
         try {
             const entry = await this.entryRepository.create(entryData);
             entry.licensePlate = entry.licensePlate.toUpperCase();
-            entry.entryDateTime = new Date();
+            entry.entryDateTime = (0, chileanTimezoneFunc_1.chileanDateGenerator)();
             entry.isParked = true;
             entry.total = 0;
-            const formattedDate = (0, timeFunctions_1.formatDate)(entry.entryDateTime);
+            const formattedDate = (0, timeFunction_1.formatDate)(entry.entryDateTime);
             await this.paymentHistoryService.findOneByDate(formattedDate);
             return await this.entryRepository.save(entry);
         }
@@ -42,7 +43,13 @@ let EntryService = class EntryService {
     async findAll(page = 1, limit = 50) {
         try {
             const skip = (page - 1) * limit;
-            return await this.entryRepository.find({ skip, take: limit });
+            const date = (0, timeFunction_1.formatDate)((0, chileanTimezoneFunc_1.chileanDateGenerator)());
+            const entries = await this.entryRepository.createQueryBuilder('entry')
+                .where("DATE(entry.entryDateTime) = :date", { date })
+                .skip(skip)
+                .take(limit)
+                .getMany();
+            return entries;
         }
         catch (error) {
             throw new common_1.InternalServerErrorException('Failed to fetch entries');
@@ -92,7 +99,7 @@ let EntryService = class EntryService {
             if (entryToUpdate.isParked === false) {
                 throw new common_1.NotFoundException('Entry is not parked');
             }
-            entryToUpdate.exitDateTime = new Date();
+            entryToUpdate.exitDateTime = (0, chileanTimezoneFunc_1.chileanDateGenerator)();
             entryToUpdate.isParked = false;
             entryToUpdate.total = entryData.total;
             await this.entryRepository.update(id, entryToUpdate);

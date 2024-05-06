@@ -3,10 +3,10 @@ import { Injectable, NotFoundException, InternalServerErrorException } from '@ne
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Entry } from './entry.entity';
-import { formatDate, getChileanDateTime} from 'src/utility/timeFunctions';
+import { formatDate } from 'src/utility/timeFunction';
 import { PaymentHistoryService } from '../paymentHistory/payment-history.service';
 import { PaymentHistory } from 'src/paymentHistory/payment-history.entity';
-
+import { chileanDateGenerator } from 'src/utility/chileanTimezoneFunc';
 @Injectable()
 export class EntryService {
   constructor(
@@ -19,7 +19,7 @@ export class EntryService {
     try {
       const entry = await this.entryRepository.create(entryData);
       entry.licensePlate= entry.licensePlate.toUpperCase();
-      entry.entryDateTime = new Date();
+      entry.entryDateTime = chileanDateGenerator();
       entry.isParked = true;
       entry.total = 0;
       const formattedDate= formatDate(entry.entryDateTime);
@@ -33,7 +33,14 @@ export class EntryService {
   async findAll(page: number = 1, limit: number = 50): Promise<Entry[]> {
     try {
       const skip = (page - 1) * limit;
-      return await this.entryRepository.find({ skip, take: limit });
+      const date= formatDate(chileanDateGenerator());
+      const entries = await this.entryRepository.createQueryBuilder('entry')
+        .where("DATE(entry.entryDateTime) = :date", { date })
+        .skip(skip)
+        .take(limit)
+        .getMany();
+
+      return entries;
     } catch (error) {
       throw new InternalServerErrorException('Failed to fetch entries');
     }
@@ -84,7 +91,7 @@ export class EntryService {
       if(entryToUpdate.isParked===false){
         throw new NotFoundException('Entry is not parked');
       }
-      entryToUpdate.exitDateTime = new Date();
+      entryToUpdate.exitDateTime = chileanDateGenerator();
       entryToUpdate.isParked = false;
       entryToUpdate.total = entryData.total;
 

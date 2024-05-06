@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PaymentHistory } from './payment-history.entity';
-import { formatDate } from 'src/utility/timeFunctions';
+import { formatDate } from 'src/utility/timeFunction';
 import { Entry } from 'src/entry/entry.entity';
 
 @Injectable()

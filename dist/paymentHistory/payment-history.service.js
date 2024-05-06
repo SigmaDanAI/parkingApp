@@ -17,7 +17,7 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const payment_history_entity_1 = require("./payment-history.entity");
-const timeFunctions_1 = require("../utility/timeFunctions");
+const timeFunction_1 = require("../utility/timeFunction");
 let PaymentHistoryService = class PaymentHistoryService {
     constructor(paymentHistoryRepository) {
         this.paymentHistoryRepository = paymentHistoryRepository;
@@ -34,7 +34,7 @@ let PaymentHistoryService = class PaymentHistoryService {
         return paymentHistory;
     }
     async create(paymentHistoryData) {
-        paymentHistoryData.date = (0, timeFunctions_1.formatDate)(new Date());
+        paymentHistoryData.date = (0, timeFunction_1.formatDate)(new Date());
         return this.paymentHistoryRepository.save(paymentHistoryData);
     }
     async update(date, paymentHistoryData) {
